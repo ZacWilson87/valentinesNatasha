@@ -15,11 +15,11 @@ export default async function (req, res) {
     return;
   }
 
-  const animal = req.body.animal || '';
-  if (animal.trim().length === 0) {
+  const trait = req.body.trait || '';
+  if (trait.trim().length === 0) {
     res.status(400).json({
       error: {
-        message: "Please enter a valid animal",
+        message: "Please enter a valid trait to compliment",
       }
     });
     return;
@@ -28,10 +28,12 @@ export default async function (req, res) {
   try {
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: generatePrompt(animal),
+      prompt: generatePrompt(trait),
       temperature: 0.6,
     });
+    console.log("zac", completion)
     res.status(200).json({ result: completion.data.choices[0].text });
+
   } catch(error) {
     // Consider adjusting the error handling logic for your use case
     if (error.response) {
@@ -48,15 +50,15 @@ export default async function (req, res) {
   }
 }
 
-function generatePrompt(animal) {
-  const capitalizedAnimal =
-    animal[0].toUpperCase() + animal.slice(1).toLowerCase();
-  return `Suggest three names for an animal that is a superhero.
+function generatePrompt(traitToCompliment) {
+  const capitalizedTrait =
+    traitToCompliment[0].toUpperCase() + traitToCompliment.slice(1).toLowerCase();
+  return `Give three compliments on a given trait
 
-Animal: Cat
-Names: Captain Sharpclaw, Agent Fluffball, The Incredible Feline
-Animal: Dog
-Names: Ruff the Protector, Wonder Canine, Sir Barks-a-Lot
-Animal: ${capitalizedAnimal}
-Names:`;
+Trait: Clothes
+Compliment: You are wearing a nice shirt!, I like your shoes!, those are some sweet pants!
+Trait: Hair
+Compliment: Your hair is amazing!, I love your hair!, You have the hair of a Godess!
+Trait: ${capitalizedTrait}
+Compliment:`;
 }
